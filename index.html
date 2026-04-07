@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Tab</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Inter:wght@300;400;500&family=Space+Mono&display=swap');
+
+  :root {
+    /* Default: Midnight Purple */
+    --bg1: #1a1a2e;
+    --glow1: rgba(72, 52, 120, 0.4);
+    --glow2: rgba(30, 80, 120, 0.3);
+    --glow3: rgba(120, 40, 80, 0.2);
+    --accent: rgba(180, 140, 255, 0.8);
+    --accent-dim: rgba(180, 140, 255, 0.15);
+    --accent-glow: rgba(180, 140, 255, 0.3);
+    --text: #e0dce4;
+    --text-dim: rgba(255,255,255,0.45);
+    --card-bg: rgba(255,255,255,0.06);
+    --card-border: rgba(255,255,255,0.08);
+    --polaroid-bg: #f5f0e8;
+    --polaroid-text: #555;
+    --particle: rgba(180, 140, 255, 0.15);
+    --input-bg: rgba(255,255,255,0.07);
+    --input-border: rgba(255,255,255,0.1);
+  }
+
+  .theme-sakura {
+    --bg1: #2b1a2e;
+    --glow1: rgba(180, 60, 100, 0.35);
+    --glow2: rgba(220, 120, 160, 0.2);
+    --glow3: rgba(100, 40, 80, 0.25);
+    --accent: rgba(255, 150, 180, 0.9);
+    --accent-dim: rgba(255, 150, 180, 0.15);
+    --accent-glow: rgba(255, 150, 180, 0.3);
+    --particle: rgba(255, 150, 180, 0.18);
+  }
+
+  .theme-ocean {
+    --bg1: #0d1b2a;
+    --glow1: rgba(20, 80, 140, 0.4);
+    --glow2: rgba(0, 180, 180, 0.2);
+    --glow3: rgba(10, 50, 100, 0.3);
+    --accent: rgba(80, 220, 220, 0.9);
+    --accent-dim: rgba(80, 220, 220, 0.12);
+    --accent-glow: rgba(80, 220, 220, 0.3);
+    --particle: rgba(80, 220, 220, 0.15);
+  }
+
+  .theme-forest {
+    --bg1: #121a14;
+    --glow1: rgba(40, 120, 60, 0.35);
+    --glow2: rgba(80, 160, 80, 0.2);
+    --glow3: rgba(30, 80, 40, 0.25);
+    --accent: rgba(140, 230, 140, 0.85);
+    --accent-dim: rgba(140, 230, 140, 0.12);
+    --accent-glow: rgba(140, 230, 140, 0.25);
+    --particle: rgba(140, 230, 140, 0.15);
+  }
+
+  .theme-ember {
+    --bg1: #1e1410;
+    --glow1: rgba(180, 80, 20, 0.35);
+    --glow2: rgba(220, 140, 40, 0.2);
+    --glow3: rgba(120, 40, 20, 0.25);
+    --accent: rgba(255, 180, 80, 0.9);
+    --accent-dim: rgba(255, 180, 80, 0.12);
+    --accent-glow: rgba(255, 180, 80, 0.3);
+    --particle: rgba(255, 180, 80, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg1);
+    background-image:
+      radial-gradient(ellipse at 20% 50%, var(--glow1) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, var(--glow2) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, var(--glow3) 0%, transparent 50%);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+    padding: 36px 20px 48px;
+    max-width: 960px;
+    width: 100%;
+  }
+
+  /* ---- CLOCK ---- */
+  .clock { font-family: 'Space Mono', monospace; font-size: 4.5rem; letter-spacing: 6px; color: rgba(255,255,255,0.88); text-shadow: 0 0 40px var(--accent-glow); }
+  .date-line { font-family: 'Inter', sans-serif; font-size: 0.95rem; color: var(--text-dim); margin-top: -10px; letter-spacing: 2px; text-transform: uppercase; }
+  .greeting { font-family: 'Caveat', cursive; font-size: 1.8rem; color: rgba(255,255,255,0.5); margin-top: -8px; }
+
+  /* ---- MAIN ROW ---- */
+  .main-row { display: flex; gap: 44px; align-items: flex-start; width: 100%; justify-content: center; flex-wrap: wrap; }
+
+  /* ---- POLAROID ---- */
+  .polaroid-wrapper { flex-shrink: 0; transform: rotate(-3deg); transition: transform 0.4s ease; animation: floatIn 0.8s ease-out; }
+  .polaroid-wrapper:hover { transform: rotate(0deg) scale(1.04); }
+  .polaroid { background: var(--polaroid-bg); padding: 14px 14px 54px 14px; box-shadow: 0 6px 28px rgba(0,0,0,0.45), 0 0 60px var(--accent-dim); width: 260px; position: relative; border-radius: 2px; }
+  .polaroid img { width: 100%; height: 310px; object-fit: cover; display: block; background: #ddd; border-radius: 1px; }
+  .polaroid-caption { font-family: 'Caveat', cursive; color: var(--polaroid-text); font-size: 1.15rem; text-align: center; position: absolute; bottom: 14px; left: 14px; right: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tape { position: absolute; width: 80px; height: 24px; background: rgba(255,255,200,0.35); top: -11px; left: 50%; transform: translateX(-50%) rotate(2deg); border-radius: 1px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); z-index: 2; }
+  .polaroid-refresh { position: absolute; bottom: 14px; right: 18px; background: none; border: none; color: #aaa; cursor: pointer; font-size: 1rem; transition: color 0.3s; }
+  .polaroid-refresh:hover { color: #666; }
+
+  /* ---- FACT CARD ---- */
+  .fact-card { background: var(--card-bg); border: 1px solid var(--card-border); backdrop-filter: blur(14px); border-radius: 18px; padding: 32px 30px 24px; max-width: 440px; flex: 1; min-width: 290px; animation: fadeUp 0.6s ease-out 0.2s both; }
+  .fact-label { font-family: 'Caveat', cursive; font-size: 1.35rem; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .fact-text { font-size: 1.1rem; line-height: 1.7; color: rgba(255,255,255,0.82); font-weight: 300; }
+  .fact-source { margin-top: 14px; font-size: 0.78rem; color: rgba(255,255,255,0.3); font-style: italic; }
+  .fact-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .btn-small { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); padding: 7px 16px; border-radius: 20px; cursor: pointer; font-size: 0.82rem; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+  .btn-small:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  /* ---- SEARCH ---- */
+  .search-container { width: 100%; max-width: 580px; animation: fadeUp 0.6s ease-out 0.4s both; }
+  .search-box { display: flex; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 40px; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; }
+  .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 28px var(--accent-dim); }
+  .search-box input { flex: 1; background: none; border: none; padding: 16px 26px; color: var(--text); font-size: 1.05rem; font-family: 'Inter', sans-serif; outline: none; }
+  .search-box input::placeholder { color: rgba(255,255,255,0.22); }
+  .search-box button { background: none; border: none; padding: 16px 22px; color: var(--text-dim); cursor: pointer; font-size: 1.2rem; transition: color 0.3s; }
+  .search-box button:hover { color: var(--accent); }
+
+  /* ---- QUICK LINKS ---- */
+  .quick-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s ease-out 0.5s both; }
+  .quick-link { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); padding: 10px 20px; border-radius: 22px; color: var(--text-dim); text-decoration: none; font-size: 0.88rem; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+  .quick-link:hover { background: var(--accent-dim); border-color: var(--accent); color: rgba(255,255,255,0.85); }
+  .quick-link img { width: 16px; height: 16px; border-radius: 2px; }
+
+  /* ---- BOTTOM BAR ---- */
+  .bottom-bar { display: flex; gap: 10px; animation: fadeUp 0.6s ease-out 0.6s both; }
+  .gear-btn { background: none; border: 1px solid rgba(255,255,255,0.08); color: var(--text-dim); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+  .gear-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  /* ---- SETTINGS PANEL ---- */
+  .settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+  .settings-overlay.open { display: flex; }
+  .settings-panel { background: #1e1e30; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 32px; max-width: 520px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .settings-panel h2 { font-family: 'Caveat', cursive; font-size: 1.8rem; color: var(--accent); margin-bottom: 24px; }
+  .settings-section { margin-bottom: 24px; }
+  .settings-section h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 12px; }
+
+  .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .theme-btn { height: 48px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+  .theme-btn.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.2); }
+  .theme-btn span { font-size: 0.65rem; position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,0.7); }
+  .theme-btn.t-midnight { background: linear-gradient(135deg, #1a1a2e, #483478); }
+  .theme-btn.t-sakura  { background: linear-gradient(135deg, #2b1a2e, #b43c64); }
+  .theme-btn.t-ocean   { background: linear-gradient(135deg, #0d1b2a, #14508c); }
+  .theme-btn.t-forest  { background: linear-gradient(135deg, #121a14, #28783c); }
+  .theme-btn.t-ember   { background: linear-gradient(135deg, #1e1410, #b45014); }
+
+  /* Link editor */
+  .link-list { display: flex; flex-direction: column; gap: 10px; }
+  .link-row { display: flex; gap: 8px; align-items: center; }
+  .link-row input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 0.88rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.3s; }
+  .link-row input:focus { border-color: var(--accent); }
+  .link-row input::placeholder { color: rgba(255,255,255,0.2); }
+  .link-row .del-btn { background: none; border: none; color: rgba(255,100,100,0.5); cursor: pointer; font-size: 1.2rem; padding: 4px 8px; transition: color 0.3s; }
+  .link-row .del-btn:hover { color: rgba(255,100,100,0.9); }
+  .add-link-btn { background: var(--accent-dim); border: 1px dashed var(--accent); color: var(--accent); padding: 10px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-family: 'Inter', sans-serif; transition: all 0.3s; margin-top: 4px; }
+  .add-link-btn:hover { background: rgba(255,255,255,0.08); }
+
+  .settings-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-save { background: var(--accent); color: #111; border: none; padding: 10px 28px; border-radius: 20px; cursor: pointer; font-weight: 500; font-size: 0.9rem; font-family: 'Inter', sans-serif; transition: opacity 0.3s; }
+  .btn-save:hover { opacity: 0.85; }
+  .btn-cancel { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); padding: 10px 22px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-family: 'Inter', sans-serif; transition: all 0.3s; }
+  .btn-cancel:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+
+  /* Search engine selector */
+  .engine-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .engine-btn { padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: var(--text-dim); cursor: pointer; font-size: 0.84rem; font-family: 'Inter', sans-serif; transition: all 0.3s; }
+  .engine-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .engine-btn:hover { border-color: var(--accent); }
+
+  /* ---- PARTICLES ---- */
+  .particle { position: fixed; border-radius: 50%; background: var(--particle); pointer-events: none; animation: drift linear infinite; }
+
+  @keyframes drift {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+  }
+  @keyframes floatIn { from { opacity: 0; transform: rotate(-3deg) translateY(20px); } to { opacity: 1; transform: rotate(-3deg) translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .loading-placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="clock" id="clock">--:--</div>
+  <div class="date-line" id="date-line"></div>
+  <div class="greeting" id="greeting"></div>
+
+  <div class="main-row">
+    <div class="polaroid-wrapper">
+      <div class="tape"></div>
+      <div class="polaroid">
+        <img id="anime-img" src="" alt="anime art" />
+        <div class="polaroid-caption" id="anime-caption">loading...</div>
+        <button class="polaroid-refresh" onclick="loadAnime()" title="New image">↻</button>
+      </div>
+    </div>
+
+    <div class="fact-card">
+      <div class="fact-label">✦ did you know?</div>
+      <div class="fact-text" id="fact-text"><span class="loading-placeholder">fetching a fun fact...</span></div>
+      <div class="fact-source" id="fact-source"></div>
+      <div class="fact-actions">
+        <button class="btn-small" onclick="loadFact()">↻ another one</button>
+        <button class="btn-small" onclick="copyFact()">copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-container">
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search the web..." autofocus />
+      <button onclick="doSearch()">⏎</button>
+    </div>
+  </div>
+
+  <div class="quick-links" id="quick-links"></div>
+
+  <div class="bottom-bar">
+    <button class="gear-btn" onclick="openSettings()" title="Settings">⚙</button>
+  </div>
+</div>
+
+<!-- SETTINGS OVERLAY -->
+<div class="settings-overlay" id="settings-overlay" onclick="event.target===this&&closeSettings()">
+  <div class="settings-panel">
+    <h2>✦ settings</h2>
+
+    <div class="settings-section">
+      <h3>Theme</h3>
+      <div class="theme-grid" id="theme-grid">
+        <button class="theme-btn t-midnight active" data-theme="" onclick="previewTheme(this)"><span>Midnight</span></button>
+        <button class="theme-btn t-sakura" data-theme="theme-sakura" onclick="previewTheme(this)"><span>Sakura</span></button>
+        <button class="theme-btn t-ocean" data-theme="theme-ocean" onclick="previewTheme(this)"><span>Ocean</span></button>
+        <button class="theme-btn t-forest" data-theme="theme-forest" onclick="previewTheme(this)"><span>Forest</span></button>
+        <button class="theme-btn t-ember" data-theme="theme-ember" onclick="previewTheme(this)"><span>Ember</span></button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Search Engine</h3>
+      <div class="engine-options" id="engine-options">
+        <button class="engine-btn active" data-engine="google" onclick="pickEngine(this)">Google</button>
+        <button class="engine-btn" data-engine="ddg" onclick="pickEngine(this)">DuckDuckGo</button>
+        <button class="engine-btn" data-engine="bing" onclick="pickEngine(this)">Bing</button>
+        <button class="engine-btn" data-engine="youtube" onclick="pickEngine(this)">YouTube</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Quick Links</h3>
+      <div class="link-list" id="link-editor"></div>
+      <button class="add-link-btn" onclick="addLinkRow()">+ add link</button>
+    </div>
+
+    <div class="settings-actions">
+      <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+      <button class="btn-save" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- STATE ----
+  const DEFAULT_LINKS = [
+    { label: 'YouTube', url: 'https://youtube.com', icon: '▶' },
+    { label: 'Reddit', url: 'https://reddit.com', icon: '◉' },
+    { label: 'GitHub', url: 'https://github.com', icon: '⬡' },
+    { label: 'Random Wiki', url: 'https://en.wikipedia.org/wiki/Special:Random', icon: '🎲' },
+    { label: 'MAL', url: 'https://myanimelist.net', icon: '⟡' },
+    { label: 'Crunchyroll', url: 'https://crunchyroll.com', icon: '⏵' },
+  ];
+
+  const ENGINES = {
+    google:  'https://www.google.com/search?q=',
+    ddg:     'https://duckduckgo.com/?q=',
+    bing:    'https://www.bing.com/search?q=',
+    youtube: 'https://www.youtube.com/results?search_query=',
+  };
+
+  let state = {
+    theme: '',
+    engine: 'google',
+    links: JSON.parse(JSON.stringify(DEFAULT_LINKS)),
+  };
+
+  // Load saved state
+  try {
+    const s = JSON.parse(localStorage.getItem('startpage_settings'));
+    if (s) { state = { ...state, ...s }; }
+  } catch {}
+
+  // ---- PARTICLES ----
+  function spawnParticles() {
+    document.querySelectorAll('.particle').forEach(p => p.remove());
+    for (let i = 0; i < 14; i++) {
+      const p = document.createElement('div');
+      p.classList.add('particle');
+      const size = Math.random() * 4 + 2;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDuration = (Math.random() * 20 + 15) + 's';
+      p.style.animationDelay = (Math.random() * 10) + 's';
+      document.body.appendChild(p);
+    }
+  }
+  spawnParticles();
+
+  // ---- CLOCK ----
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('date-line').textContent =
+      days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+    const h = now.getHours();
+    let g = 'good evening ☽';
+    if (h < 12) g = 'good morning ☀';
+    else if (h < 18) g = 'good afternoon ✿';
+    document.getElementById('greeting').textContent = g;
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // ---- FUN FACT ----
+  const fallbackFacts = [
+    "Octopuses have three hearts and blue blood. Two pump blood to the gills, one to the rest of the body.",
+    "A day on Venus is longer than a year on Venus — it takes 243 Earth days to rotate once but only 225 to orbit the Sun.",
+    "Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still perfectly edible.",
+    "Bananas are berries, but strawberries aren't. Botanically, a berry must come from a single-ovary flower.",
+    "Neutron stars are so dense that a teaspoon of their material would weigh about 6 billion tons.",
+    "There are more possible iterations of a game of chess than there are atoms in the observable universe.",
+    "The Eiffel Tower can grow up to 15 cm taller in summer because heat causes the iron to expand.",
+    "Tardigrades can survive in the vacuum of space, extreme radiation, and temperatures from near absolute zero to 150°C.",
+    "The shortest war in history lasted 38 to 45 minutes — between Britain and Zanzibar in 1896.",
+    "Your brain uses about 20% of your total energy, despite being only ~2% of your body weight.",
+    "A group of flamingos is called a 'flamboyance.'",
+    "Sound travels about 4.3 times faster in water than in air.",
+    "The total weight of all ants on Earth roughly equals the total weight of all humans.",
+    "Light from the Sun takes about 8 minutes and 20 seconds to reach Earth.",
+    "Cows have best friends and get stressed when separated from them.",
+    "The inventor of the Pringles can is buried in one.",
+    "A jiffy is an actual unit of time — 1/100th of a second.",
+    "Wombat poop is cube-shaped to prevent it from rolling away.",
+    "There's enough DNA in the average human body to stretch from the Sun to Pluto and back 17 times.",
+    "The heart of a blue whale is so big a small child could swim through its arteries."
+  ];
+  let currentFact = '';
+
+  async function loadFact() {
+    const el = document.getElementById('fact-text');
+    const srcEl = document.getElementById('fact-source');
+    el.innerHTML = '<span class="loading-placeholder">fetching a fun fact...</span>';
+    srcEl.textContent = '';
+    try {
+      const res = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=en');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      currentFact = data.text;
+      el.textContent = currentFact;
+      srcEl.textContent = data.source ? '— ' + data.source : '';
+    } catch {
+      currentFact = fallbackFacts[Math.floor(Math.random() * fallbackFacts.length)];
+      el.textContent = currentFact;
+      srcEl.textContent = '— local collection';
+    }
+  }
+  loadFact();
+
+  function copyFact() {
+    if (currentFact) navigator.clipboard.writeText(currentFact);
+  }
+
+  // ---- ANIME POLAROID ----
+  async function loadAnime() {
+    const img = document.getElementById('anime-img');
+    const cap = document.getElementById('anime-caption');
+    cap.textContent = 'loading...';
+    try {
+      const page = Math.floor(Math.random() * 10) + 1;
+      const res = await fetch('https://api.jikan.moe/v4/top/anime?page=' + page + '&limit=25');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const list = data.data;
+      if (!list || !list.length) throw new Error();
+      const pick = list[Math.floor(Math.random() * list.length)];
+      img.src = pick.images?.jpg?.large_image_url || pick.images?.jpg?.image_url || '';
+      cap.textContent = pick.title || 'unknown';
+    } catch {
+      img.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="232" height="310" fill="#ddd"><rect width="232" height="310"/><text x="50%" y="50%" text-anchor="middle" fill="#999" font-size="14">✦ anime</text></svg>');
+      cap.textContent = 'could not load';
+    }
+  }
+  loadAnime();
+
+  // ---- SEARCH ----
+  function doSearch() {
+    const q = document.getElementById('search-input').value.trim();
+    if (q) window.location.href = ENGINES[state.engine] + encodeURIComponent(q);
+  }
+  document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  // ---- QUICK LINKS ----
+  function renderLinks() {
+    const el = document.getElementById('quick-links');
+    el.innerHTML = '';
+    state.links.forEach(l => {
+      const a = document.createElement('a');
+      a.className = 'quick-link';
+      a.href = l.url;
+      a.target = '_blank';
+      // favicon
+      try {
+        const domain = new URL(l.url).hostname;
+        a.innerHTML = '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=32" alt="" /> ' + l.label;
+      } catch {
+        a.textContent = (l.icon||'') + ' ' + l.label;
+      }
+      el.appendChild(a);
+    });
+  }
+  renderLinks();
+
+  // ---- THEME ----
+  function applyTheme(t) {
+    document.body.className = t || '';
+    state.theme = t;
+    spawnParticles(); // re-color particles
+  }
+  applyTheme(state.theme);
+
+  // ---- SETTINGS ----
+  let tempTheme = state.theme;
+  let tempEngine = state.engine;
+
+  function openSettings() {
+    tempTheme = state.theme;
+    tempEngine = state.engine;
+    document.getElementById('settings-overlay').classList.add('open');
+    // highlight active theme
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === state.theme));
+    // highlight active engine
+    document.querySelectorAll('.engine-btn').forEach(b => b.classList.toggle('active', b.dataset.engine === state.engine));
+    // populate link editor
+    renderLinkEditor();
+  }
+
+  function closeSettings() {
+    document.getElementById('settings-overlay').classList.remove('open');
+    applyTheme(state.theme); // revert preview
+  }
+
+  function previewTheme(btn) {
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tempTheme = btn.dataset.theme;
+    applyTheme(tempTheme);
+  }
+
+  function pickEngine(btn) {
+    document.querySelectorAll('.engine-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tempEngine = btn.dataset.engine;
+  }
+
+  function renderLinkEditor() {
+    const el = document.getElementById('link-editor');
+    el.innerHTML = '';
+    state.links.forEach((l, i) => {
+      const row = document.createElement('div');
+      row.className = 'link-row';
+      row.innerHTML =
+        '<input type="text" value="' + (l.label||'').replace(/"/g,'&quot;') + '" placeholder="Label" data-idx="' + i + '" data-field="label" />' +
+        '<input type="text" value="' + (l.url||'').replace(/"/g,'&quot;') + '" placeholder="https://..." data-idx="' + i + '" data-field="url" />' +
+        '<button class="del-btn" onclick="removeLink(' + i + ')">✕</button>';
+      el.appendChild(row);
+    });
+  }
+
+  function addLinkRow() {
+    state.links.push({ label: '', url: '', icon: '' });
+    renderLinkEditor();
+  }
+
+  function removeLink(i) {
+    state.links.splice(i, 1);
+    renderLinkEditor();
+  }
+
+  function saveSettings() {
+    // Read link editor inputs
+    const rows = document.querySelectorAll('#link-editor .link-row');
+    const newLinks = [];
+    rows.forEach(row => {
+      const label = row.querySelector('[data-field="label"]').value.trim();
+      const url = row.querySelector('[data-field="url"]').value.trim();
+      if (label && url) newLinks.push({ label, url, icon: '' });
+    });
+    state.links = newLinks;
+    state.theme = tempTheme;
+    state.engine = tempEngine;
+
+    try { localStorage.setItem('startpage_settings', JSON.stringify(state)); } catch {}
+
+    applyTheme(state.theme);
+    renderLinks();
+    closeSettings();
+  }
+
+  // highlight engine on load
+  document.querySelectorAll('.engine-btn').forEach(b => b.classList.toggle('active', b.dataset.engine === state.engine));
+</script>
+
+</body>
+</html>
